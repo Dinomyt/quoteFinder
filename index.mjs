@@ -7,7 +7,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 const pool = new Pool({
-    connectionString: 'postgresql://root:inKnmBfjkZVvODT0flHdUOuPZpZUqpXB@dpg-d24p8f1r0fns73db75d0-a/quotes_1gmx',
+    connectionString: process.env.DB_URL, 
     ssl: {
         rejectUnauthorized: false
     }
