@@ -1,0 +1,78 @@
+<%- include("partials/header.ejs") %>
+
+<div class="text-center">
+  <h1>📜 Famous Quote Finder</h1>
+  <p class="lead">Find inspiration from the greatest minds.</p>
+</div>
+
+<div class="row g-4 justify-content-center mt-4">
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Search by Keyword</h5>
+        <form action="/searchByKeyword">
+          <div class="mb-3">
+            <input type="text" name="keyword" class="form-control" placeholder="e.g., life, wisdom" required>
+          </div>
+          <button class="btn btn-primary w-100">Search Keyword</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Search by Author</h5>
+        <form action="/searchByAuthor">
+          <div class="mb-3">
+            <select name="authorId" class="form-select">
+              <% authors.forEach(function(author){ %>
+                <option value="<%= author.authorId %>"><%= author.firstName %> <%= author.lastName %></option>
+              <% }) %>
+            </select>
+          </div>
+          <button class="btn btn-primary w-100">Search Author</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Search by Category</h5>
+        <form action="/searchByCategory">
+          <div class="mb-3">
+            <select name="category" class="form-select">
+              <% categories.forEach(function(cat){ %>
+                <option value="<%= cat.category %>"><%= cat.category %></option>
+              <% }) %>
+            </select>
+          </div>
+          <button class="btn btn-primary w-100">Search Category</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Search by Likes</h5>
+        <form action="/searchByLikes">
+          <div class="input-group mb-3">
+            <input type="number" name="minLikes" class="form-control" placeholder="Min Likes" value="0" required>
+            <span class="input-group-text">-</span>
+            <input type="number" name="maxLikes" class="form-control" placeholder="Max Likes" value="5000" required>
+          </div>
+          <button class="btn btn-primary w-100">Search Likes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<%- include("partials/footer.ejs") %>
