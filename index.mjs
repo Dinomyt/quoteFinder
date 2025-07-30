@@ -2,6 +2,9 @@ import express from 'express';
 import pg from 'pg';
 const { Pool } = pg;
 
+// This will be automatically loaded by Render from your Environment Variables
+// For local development, you would use a .env file
+import 'dotenv/config'; 
 
 const app = express();
 app.set("view engine", "ejs");
@@ -18,8 +21,8 @@ const pool = new Pool({
 // Root route to display search forms
 app.get('/', async (req, res) => {
   try {
-    // Use double quotes for case-sensitive column names
-    const authorSql = 'SELECT "authorId", "firstName", "lastName" FROM q_authors ORDER BY "lastName"';
+    // Use lowercase column names to match the database schema
+    const authorSql = 'SELECT authorid, firstname, lastname FROM q_authors ORDER BY lastname';
     const categorySql = 'SELECT DISTINCT category FROM q_quotes ORDER BY category';
     
     // Use { rows } to destructure the result from the 'pg' library
@@ -38,7 +41,7 @@ app.get("/searchByKeyword", async (req, res) => {
   try {
     const keyword = req.query.keyword;
     // Use ILIKE for case-insensitive matching and $1 for the parameter
-    const sql = `SELECT quote, "authorId", "firstName", "lastName"
+    const sql = `SELECT quote, authorid, firstname, lastname
                  FROM q_quotes
                  NATURAL JOIN q_authors
                  WHERE quote ILIKE $1`; 
@@ -55,10 +58,10 @@ app.get("/searchByKeyword", async (req, res) => {
 app.get("/searchByAuthor", async (req, res) => {
   try {
     const authorId = req.query.authorId;
-    const sql = `SELECT quote, "authorId", "firstName", "lastName"
+    const sql = `SELECT quote, authorid, firstname, lastname
                  FROM q_quotes
                  NATURAL JOIN q_authors
-                 WHERE "authorId" = $1`;
+                 WHERE authorid = $1`;
     const { rows } = await pool.query(sql, [authorId]);
     res.render("results", { quotes: rows });
   } catch (err) {
@@ -71,7 +74,7 @@ app.get("/searchByAuthor", async (req, res) => {
 app.get("/searchByCategory", async (req, res) => {
   try {
     const category = req.query.category;
-    const sql = `SELECT quote, "authorId", "firstName", "lastName"
+    const sql = `SELECT quote, authorid, firstname, lastname
                  FROM q_quotes
                  NATURAL JOIN q_authors
                  WHERE category = $1`;
@@ -88,7 +91,7 @@ app.get("/searchByLikes", async (req, res) => {
   try {
     const minLikes = req.query.minLikes;
     const maxLikes = req.query.maxLikes;
-    const sql = `SELECT quote, "authorId", "firstName", "lastName"
+    const sql = `SELECT quote, authorid, firstname, lastname
                  FROM q_quotes
                  NATURAL JOIN q_authors
                  WHERE likes BETWEEN $1 AND $2`;
@@ -104,7 +107,7 @@ app.get("/searchByLikes", async (req, res) => {
 app.get('/api/author/:id', async (req, res) => {
   try {
     const authorId = req.params.id;
-    const sql = `SELECT * FROM q_authors WHERE "authorId" = $1`;
+    const sql = `SELECT * FROM q_authors WHERE authorid = $1`;
     const { rows } = await pool.query(sql, [authorId]);
     res.send(rows[0]); // Send first (and only) result
   } catch (err) {
