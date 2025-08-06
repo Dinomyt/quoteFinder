@@ -15,7 +15,7 @@
             <label for="authorId" class="form-label">Author</label>
             <select class="form-select" id="authorId" name="authorId" required>
               <% authors.forEach(function(author) { %>
-                <option value="<%= author.authorid %>"><%= author.firstname %> <%= author.lastname %></option>
+                <option value="<%= author.authorId %>"><%= author.firstName %> <%= author.lastName %></option>
               <% }); %>
             </select>
           </div>
