@@ -1,53 +1,69 @@
 <%- include("partials/header.ejs") %>
 
-<h1>Search Results</h1>
+<h1 class="my-4">Search Results</h1>
 
 <% if (quotes.length > 0) { %>
-  <% quotes.forEach(function(q){ %>
-    <div class="card my-3">
+  <% quotes.forEach(function(q) { %>
+    <div class="card mb-3">
       <div class="card-body">
         <blockquote class="blockquote mb-0">
           <p>"<%= q.quote %>"</p>
           <footer class="blockquote-footer">
-            <a href="#" class="author-link" id="<%= q.authorId %>"><%= q.firstName %> <%= q.lastName %></a>
+            <a href="#" class="author-link" data-author-id="<%= q.authorId %>">
+              <%= q.firstName %> <%= q.lastName %>
+            </a>
           </footer>
         </blockquote>
+
         <div class="mt-3">
-            <button class="btn btn-warning btn-sm" onclick="editQuote('<%= q.quoteId %>')">Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteQuote('<%= q.quoteId %>')">Delete</button>
+          <button
+            class="btn btn-sm btn-warning"
+            onclick="editQuote(<%= q.quoteId %>)"
+          >Edit</button>
+
+          <button
+            class="btn btn-sm btn-danger"
+            onclick="deleteQuote(<%= q.quoteId %>)"
+          >Delete</button>
         </div>
       </div>
     </div>
-  <% }) %>
+  <% }); %>
 <% } else { %>
-  <div class="alert alert-warning" role="alert">
-    No quotes found matching your criteria. <a href="/" class="alert-link">Try another search</a>.
+  <div class="alert alert-warning">
+    No quotes found matching your criteria.
+    <a href="/" class="alert-link">Back to search</a>.
   </div>
 <% } %>
 
 <a href="/" class="btn btn-secondary mt-3">Back to Search</a>
 
-<div class="modal fade" id="editQuoteModal" tabindex="-1" aria-labelledby="editQuoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            </div>
+
+<!-- EDIT QUOTE MODAL -->
+<div class="modal fade" id="editQuoteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- we’ll inject the partial’s HTML here -->
+      <div class="modal-body"></div>
     </div>
+  </div>
 </div>
 
-
+<!-- AUTHOR INFO MODAL (optional) -->
 <div class="modal fade" id="authorModal" tabindex="-1" aria-labelledby="authorModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="authorModalLabel">Author Information</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="authorModalLabel">Author Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div id="authorInfo">
-          </div>
+      <div class="modal-body" id="authorInfo">
+        <!-- injected by your author-fetch script -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>

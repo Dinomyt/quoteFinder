@@ -9,14 +9,14 @@
             <textarea class="form-control" name="quote" rows="3" required><%= quote.quote %></textarea>
         </div>
         <div class="mb-3">
-            <label for="authorId" class="form-label">Author</label>
-            <select class="form-select" name="authorId" required>
-                <% authors.forEach(function(author) { %>
-                    <option value="<%= author.authorid %>" <%= quote.authorid == author.authorid ? 'selected' : '' %>>
-                        <%= author.firstname %> <%= author.lastname %>
-                    </option>
-                <% }); %>
-            </select>
+        <label for="authorId" class="form-label">Author</label>
+        <select class="form-select" id="authorId" name="authorId" required>
+            <% authors.forEach(function(author) { %>
+            <option value="<%= author.authorId %>">
+                <%= author.firstName %> <%= author.lastName %>
+            </option>
+            <% }); %>
+        </select>
         </div>
         <div class="mb-3">
             <label for="category" class="form-label">Category</label>
