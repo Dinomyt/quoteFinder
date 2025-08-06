@@ -1,21 +1,18 @@
-// Wait until the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", function() {
-  // AUTHOR INFO LINKS
+document.addEventListener("DOMContentLoaded", () => {
+  // Wire up author info links
   const authorLinks = document.querySelectorAll(".author-link");
   const authorModalEl = document.getElementById("authorModal");
   if (authorModalEl && authorLinks.length) {
     const authorModal = new bootstrap.Modal(authorModalEl);
     authorLinks.forEach(link => {
-      link.addEventListener("click", event => {
-        event.preventDefault();
-        // Assuming you use `id="<%= q.authorId %>"` on the link
+      link.addEventListener("click", e => {
+        e.preventDefault();
         getAuthorInfo(link.id, authorModal);
       });
     });
   }
 });
 
-// Fetch & display author details in the authorModal
 async function getAuthorInfo(authorId, modalInstance) {
   const authorInfoDiv = document.getElementById("authorInfo");
   authorInfoDiv.innerHTML = `
@@ -31,18 +28,13 @@ async function getAuthorInfo(authorId, modalInstance) {
     const res = await fetch(`/api/author/${authorId}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
     const dob = new Date(data.dob).toLocaleDateString();
     const dod = data.dod ? new Date(data.dod).toLocaleDateString() : "N/A";
 
     authorInfoDiv.innerHTML = `
       <div class="row">
         <div class="col-md-4 text-center">
-          <img
-            src="${data.portrait || data.pictureUrl}"
-            alt="${data.firstName} ${data.lastName}"
-            class="img-fluid rounded mb-3"
-          >
+          <img src="${data.portrait || data.pictureUrl}" class="img-fluid rounded mb-3" alt="${data.firstName} ${data.lastName}">
         </div>
         <div class="col-md-8">
           <h4>${data.firstName} ${data.lastName}</h4>
@@ -57,29 +49,20 @@ async function getAuthorInfo(authorId, modalInstance) {
     `;
   } catch (err) {
     console.error("Failed to fetch author info:", err);
-    authorInfoDiv.innerHTML = `
-      <div class="alert alert-danger">
-        Could not load author information.
-      </div>
-    `;
+    authorInfoDiv.innerHTML = `<div class="alert alert-danger">Could not load author information.</div>`;
   }
 }
 
-// Load the edit form partial into the editQuoteModal and show it
 async function editQuote(quoteId) {
   try {
     const res = await fetch(`/api/quotes/${quoteId}/edit`);
     if (!res.ok) {
-      const text = await res.text();
-      console.error("Edit fetch failed:", text);
+      console.error(await res.text());
       alert("Could not load edit form.");
       return;
     }
-
     const html = await res.text();
-    // Inject into the .modal-body, keeping the .modal-dialog wrapper intact
     document.querySelector("#editQuoteModal .modal-body").innerHTML = html;
-
     new bootstrap.Modal(document.getElementById("editQuoteModal")).show();
   } catch (err) {
     console.error("Error loading edit form:", err);
@@ -87,24 +70,18 @@ async function editQuote(quoteId) {
   }
 }
 
-// Delete a quote by ID (with confirmation)
 async function deleteQuote(quoteId) {
   if (!confirm("Are you sure you want to delete this quote?")) return;
-
   try {
-    const res = await fetch(`/api/quotes/${quoteId}`, {
-      method: "DELETE"
-    });
+    const res = await fetch(`/api/quotes/${quoteId}`, { method: "DELETE" });
     if (res.ok) {
-      // either reload or remove the card from DOM
       window.location.reload();
     } else {
-      const text = await res.text();
-      console.error("Delete failed:", text);
+      console.error(await res.text());
       alert("Failed to delete quote.");
     }
   } catch (err) {
-    console.error("Error during delete:", err);
+    console.error("Error deleting quote:", err);
     alert("Error deleting quote.");
   }
 }
