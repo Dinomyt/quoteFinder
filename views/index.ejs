@@ -1,90 +1,123 @@
 <%- include("partials/header.ejs") %>
 
-<div class="text-center">
-  <h1>📜 Famous Quote Finder</h1>
-  <p class="lead">Find inspiration from the greatest minds.</p>
+<div class="container mt-4">
+  <h1 class="mb-4">Quote Finder</h1>
+
+  <div class="row">
+    <!-- Keyword Search -->
+    <div class="col-md-6">
+      <form action="/searchByKeyword" method="GET" class="needs-validation mb-4" novalidate>
+        <div class="input-group">
+          <input
+            type="text"
+            name="keyword"
+            class="form-control"
+            placeholder="Search by keyword…"
+            required
+          >
+          <button class="btn btn-outline-secondary" type="submit">Go</button>
+          <div class="invalid-feedback">
+            Please enter a keyword.
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Category Search -->
+    <div class="col-md-6">
+      <form action="/searchByCategory" method="GET" class="needs-validation mb-4" novalidate>
+        <div class="mb-3">
+          <label for="category" class="form-label">Search by Category</label>
+          <select
+            id="category"
+            name="category"
+            class="form-select"
+            required
+          >
+            <option value="" disabled selected>Choose a category…</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat %>"><%= cat %></option>
+            <% }); %>
+          </select>
+          <div class="invalid-feedback">
+            Please select a category.
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Go</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Author Search -->
+  <form action="/searchByAuthor" method="GET" class="needs-validation mb-4" novalidate>
+    <div class="mb-3">
+      <label for="authorId" class="form-label">Search by Author</label>
+      <select
+        id="authorId"
+        name="authorId"
+        class="form-select"
+        required
+      >
+        <option value="" disabled selected>Choose an author…</option>
+        <% authors.forEach(function(author) { %>
+          <option value="<%= author.authorId %>">
+            <%= author.firstName %> <%= author.lastName %>
+          </option>
+        <% }); %>
+      </select>
+      <div class="invalid-feedback">
+        Please select an author.
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Go</button>
+  </form>
+
+  <!-- Likes Search -->
+  <form action="/searchByLikes" method="GET" class="needs-validation mb-4" novalidate>
+    <div class="row">
+      <div class="col">
+        <label for="minLikes" class="form-label">Min Likes</label>
+        <input
+          type="number"
+          id="minLikes"
+          name="minLikes"
+          class="form-control"
+          min="0"
+          required
+        >
+        <div class="invalid-feedback">
+          Enter a minimum number of likes.
+        </div>
+      </div>
+      <div class="col">
+        <label for="maxLikes" class="form-label">Max Likes</label>
+        <input
+          type="number"
+          id="maxLikes"
+          name="maxLikes"
+          class="form-control"
+          min="0"
+          required
+        >
+        <div class="invalid-feedback">
+          Enter a maximum number of likes.
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary mt-3" type="submit">Go</button>
+  </form>
+
+  <!-- Add Quote Modal Trigger -->
+  <button
+    class="btn btn-success"
+    data-bs-toggle="modal"
+    data-bs-target="#addQuoteModal"
+  >
+    Add New Quote
+  </button>
+
+  <!-- Include the Add Quote Modal partial -->
+  <%- include("partials/addQuoteModal.ejs") %>
 </div>
-
-<div class="row justify-content-center mt-4">
-    <div class="col-md-3">
-        <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAuthorModal">Add New Author</button>
-    </div>
-    <div class="col-md-3">
-        <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#addQuoteModal">Add New Quote</button>
-    </div>
-</div>
-
-<div class="row g-4 justify-content-center mt-4">
-
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Search by Keyword</h5>
-        <form action="/searchByKeyword">
-          <div class="mb-3">
-            <input type="text" name="keyword" class="form-control" placeholder="e.g., life, wisdom" required>
-          </div>
-          <button class="btn btn-primary w-100">Search Keyword</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Search by Author</h5>
-        <form action="/searchByAuthor">
-          <div class="mb-3">
-            <select name="authorId" class="form-select">
-              <% authors.forEach(function(author){ %>
-                <option value="<%= author.authorId %>"><%= author.firstName %> <%= author.lastName %></option>
-              <% }) %>
-            </select>
-          </div>
-          <button class="btn btn-primary w-100">Search Author</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Search by Category</h5>
-        <form action="/searchByCategory">
-          <div class="mb-3">
-            <select name="category" class="form-select">
-              <% categories.forEach(function(cat){ %>
-                <option value="<%= cat.category %>"><%= cat.category %></option>
-              <% }) %>
-            </select>
-          </div>
-          <button class="btn btn-primary w-100">Search Category</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Search by Likes</h5>
-        <form action="/searchByLikes">
-          <div class="input-group mb-3">
-            <input type="number" name="minLikes" class="form-control" placeholder="Min Likes" value="0" required>
-            <span class="input-group-text">-</span>
-            <input type="number" name="maxLikes" class="form-control" placeholder="Max Likes" value="5000" required>
-          </div>
-          <button class="btn btn-primary w-100">Search Likes</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<%- include("partials/addAuthorModal.ejs") %>
-<%- include("partials/addQuoteModal.ejs", { authors: authors }) %>
 
 <%- include("partials/footer.ejs") %>
