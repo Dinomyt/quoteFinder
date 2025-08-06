@@ -155,14 +155,14 @@ app.get('/api/author/:id', async (req, res) => {
 
 app.post('/api/authors', async (req, res) => {
   try {
-    const { firstName, lastName, dob, dod, country, profession, bio, pictureUrl } = req.body;
+    const { firstName, lastName, dob, dod, sex, profession, biography, portrait } = req.body;
     const sql = `
       INSERT INTO q_authors 
-        ("firstName","lastName","dob","dod","country","profession","bio","pictureUrl")
+        ("firstName","lastName","dob","dod","sex","profession","biography","portrait")
       VALUES 
         ($1,$2,$3,$4,$5,$6,$7,$8)
     `;
-    await pool.query(sql, [firstName, lastName, dob, dod, country, profession, bio, pictureUrl]);
+    await pool.query(sql, [firstName, lastName, dob, dod, sex, profession, biography, portrait]);
 
     res.redirect('/');
   } catch (err) {
