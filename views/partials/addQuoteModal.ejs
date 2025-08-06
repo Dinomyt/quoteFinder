@@ -6,26 +6,71 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="/api/quotes" method="POST">
+        <form class="needs-validation" novalidate action="/api/quotes" method="POST">
           <div class="mb-3">
             <label for="quote" class="form-label">Quote</label>
-            <textarea class="form-control" id="quote" name="quote" rows="3" required></textarea>
+            <textarea
+              class="form-control"
+              id="quote"
+              name="quote"
+              rows="3"
+              required
+              minlength="10"
+              maxlength="500"
+            ></textarea>
+            <div class="invalid-feedback">
+              Please enter a quote (10–500 characters).
+            </div>
           </div>
           <div class="mb-3">
             <label for="authorId" class="form-label">Author</label>
-            <select class="form-select" id="authorId" name="authorId" required>
+            <select
+              class="form-select"
+              id="authorId"
+              name="authorId"
+              required
+            >
+              <option value="" disabled selected>Choose an author…</option>
               <% authors.forEach(function(author) { %>
-                <option value="<%= author.authorId %>"><%= author.firstName %> <%= author.lastName %></option>
+                <option value="<%= author.authorId %>">
+                  <%= author.firstName %> <%= author.lastName %>
+                </option>
               <% }); %>
             </select>
+            <div class="invalid-feedback">
+              You must select an author.
+            </div>
           </div>
           <div class="mb-3">
             <label for="category" class="form-label">Category</label>
-            <input type="text" class="form-control" id="category" name="category" required>
+            <input
+              type="text"
+              class="form-control"
+              id="category"
+              name="category"
+              required
+              pattern="[A-Za-z0-9 ]{3,50}"
+              maxlength="50"
+            >
+            <div class="invalid-feedback">
+              Category must be 3–50 letters or numbers.
+            </div>
           </div>
           <div class="mb-3">
             <label for="likes" class="form-label">Likes</label>
-            <input type="number" class="form-control" id="likes" name="likes" value="0" required>
+            <input
+              type="number"
+              class="form-control"
+              id="likes"
+              name="likes"
+              required
+              value="0"
+              min="0"
+              step="1"
+            >
+            <div class="invalid-feedback">
+              Please enter a non-negative integer.
+            </div>
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>

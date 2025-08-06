@@ -13,6 +13,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+ // BOOTSTRAP FORM VALIDATION
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+  
 async function getAuthorInfo(authorId, modalInstance) {
   const authorInfoDiv = document.getElementById("authorInfo");
   authorInfoDiv.innerHTML = `
