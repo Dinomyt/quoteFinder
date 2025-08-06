@@ -1,9 +1,24 @@
 <%- include("partials/header.ejs") %>
 
-<h1 class="my-4">Search Results</h1>
+<h1 class="my-4">
+  <% if (author) { %>
+    Quotes by <%= author.firstName %> <%= author.lastName %>
+  <% } else { %>
+    Search Results
+  <% } %>
+</h1>
+
+<% if (authorId) { %>
+  <button
+    class="btn btn-danger mb-3"
+    onclick="deleteAuthor(<%= authorId %>)"
+  >
+    Delete Author
+  </button>
+<% } %>
 
 <% if (quotes.length > 0) { %>
-  <% quotes.forEach(function(q) { %>
+  <% quotes.forEach(q => { %>
     <div class="card mb-3">
       <div class="card-body">
         <blockquote class="blockquote mb-0">
@@ -15,22 +30,19 @@
           </footer>
         </blockquote>
         <div class="mt-3">
-          <button
-            class="btn btn-sm btn-warning"
-            onclick="editQuote(<%= q.quoteId %>)"
-          >Edit</button>
-          <button
-            class="btn btn-sm btn-danger"
-            onclick="deleteQuote(<%= q.quoteId %>)"
-          >Delete</button>
+          <button class="btn btn-sm btn-warning" onclick="editQuote(<%= q.quoteId %>)">
+            Edit
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteQuote(<%= q.quoteId %>)">
+            Delete
+          </button>
         </div>
       </div>
     </div>
-  <% }); %>
+  <% }) %>
 <% } else { %>
   <div class="alert alert-warning">
-    No quotes found matching your criteria.
-    <a href="/" class="alert-link">Back to search</a>.
+    No quotes found. <a href="/" class="alert-link">Back to search</a>.
   </div>
 <% } %>
 
@@ -53,11 +65,9 @@
         <h5 class="modal-title" id="authorModalLabel">Author Information</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body" id="authorInfo"><!-- injected by scripts.js --></div>
+      <div class="modal-body" id="authorInfo"><!-- injected --></div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

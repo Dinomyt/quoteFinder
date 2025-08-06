@@ -12,169 +12,148 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Root route
+// ─── Root ─────────────────────────────────────────────────────────────────────
 app.get('/', async (req, res) => {
   try {
-    const authorSql = `
-      SELECT
-        "authorId",
-        "firstName",
-        "lastName"
+    const authors   = (await pool.query(`
+      SELECT "authorId","firstName","lastName"
       FROM q_authors
       ORDER BY "lastName"
-    `;
-    const categorySql = `
+    `)).rows;
+
+    const categories = (await pool.query(`
       SELECT DISTINCT "category"
       FROM q_quotes
       ORDER BY "category"
-    `;
-
-    const { rows: authors }    = await pool.query(authorSql);
-    const { rows: categories } = await pool.query(categorySql);
+    `)).rows.map(r => r.category);
 
     res.render('index', { authors, categories });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching data. 1");
+    res.status(500).send("Error fetching data.");
   }
 });
 
-// Keyword Search
+// ─── Keyword Search ────────────────────────────────────────────────────────────
 app.get("/searchByKeyword", async (req, res) => {
   try {
     const keyword = req.query.keyword;
-    const sql = `
+    const rows = (await pool.query(`
       SELECT
-        q."quoteId",
-        q."quote",
-        q."authorId",
-        a."firstName",
-        a."lastName"
+        q."quoteId", q."quote", q."authorId",
+        a."firstName", a."lastName"
       FROM q_quotes AS q
       JOIN q_authors AS a
         ON q."authorId" = a."authorId"
       WHERE q."quote" ILIKE $1
-    `;
-    const { rows } = await pool.query(sql, [`%${keyword}%`]);
+    `, [`%${keyword}%`])).rows;
+
     res.render("results", { quotes: rows });
   } catch (err) {
-    console.error("Database query error:", err);
-    res.status(500).send("Error fetching data from database.");
+    console.error(err);
+    res.status(500).send("Error fetching quotes.");
   }
 });
 
-// Author Search
+// ─── Author Search ─────────────────────────────────────────────────────────────
 app.get("/searchByAuthor", async (req, res) => {
   try {
     const authorId = req.query.authorId;
-    const sql = `
+
+    // fetch author name
+    const authorRes = await pool.query(`
+      SELECT "firstName","lastName"
+      FROM q_authors
+      WHERE "authorId" = $1
+    `, [authorId]);
+    const author = authorRes.rows[0];
+
+    // fetch that author’s quotes
+    const rows = (await pool.query(`
       SELECT
-        q."quoteId",
-        q."quote",
-        q."authorId",
-        a."firstName",
-        a."lastName"
+        q."quoteId", q."quote", q."authorId",
+        a."firstName", a."lastName"
       FROM q_quotes AS q
       JOIN q_authors AS a
         ON q."authorId" = a."authorId"
       WHERE q."authorId" = $1
-    `;
-    const { rows } = await pool.query(sql, [authorId]);
-    res.render("results", { quotes: rows });
+    `, [authorId])).rows;
+
+    res.render("results", {
+      quotes:    rows,
+      authorId,
+      author
+    });
   } catch (err) {
-    console.error("Database query error:", err);
-    res.status(500).send("Error fetching data from database.");
+    console.error(err);
+    res.status(500).send("Error fetching author’s quotes.");
   }
 });
 
-// Category Search
+// ─── Category Search ───────────────────────────────────────────────────────────
 app.get("/searchByCategory", async (req, res) => {
   try {
     const category = req.query.category;
-    const sql = `
+    const rows = (await pool.query(`
       SELECT
-        q."quoteId",
-        q."quote",
-        q."authorId",
-        a."firstName",
-        a."lastName"
+        q."quoteId", q."quote", q."authorId",
+        a."firstName", a."lastName"
       FROM q_quotes AS q
       JOIN q_authors AS a
         ON q."authorId" = a."authorId"
       WHERE q."category" = $1
-    `;
-    const { rows } = await pool.query(sql, [category]);
+    `, [category])).rows;
+
     res.render("results", { quotes: rows });
   } catch (err) {
-    console.error("Database query error:", err);
-    res.status(500).send("Error fetching data from database.");
+    console.error(err);
+    res.status(500).send("Error fetching quotes.");
   }
 });
 
-// Likes Search
+// ─── Likes Search ───────────────────────────────────────────────────────────────
 app.get("/searchByLikes", async (req, res) => {
   try {
     const { minLikes, maxLikes } = req.query;
-    const sql = `
+    const rows = (await pool.query(`
       SELECT
-        q."quoteId",
-        q."quote",
-        q."authorId",
-        a."firstName",
-        a."lastName"
+        q."quoteId", q."quote", q."authorId",
+        a."firstName", a."lastName"
       FROM q_quotes AS q
       JOIN q_authors AS a
         ON q."authorId" = a."authorId"
       WHERE q."likes" BETWEEN $1 AND $2
-    `;
-    const { rows } = await pool.query(sql, [minLikes, maxLikes]);
+    `, [minLikes, maxLikes])).rows;
+
     res.render("results", { quotes: rows });
   } catch (err) {
-    console.error("Database query error:", err);
-    res.status(500).send("Error fetching data from database.");
+    console.error(err);
+    res.status(500).send("Error fetching quotes.");
   }
 });
 
-// API – get author JSON
+// ─── API: Get Single Author ────────────────────────────────────────────────────
 app.get('/api/author/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const sql = `SELECT * FROM q_authors WHERE "authorId" = $1`;
-    const { rows } = await pool.query(sql, [id]);
-    res.json(rows[0]);
+    const row = (await pool.query(`
+      SELECT * FROM q_authors WHERE "authorId" = $1
+    `, [id])).rows[0];
+    res.json(row);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching author.' });
   }
 });
 
-// API – add author
-app.post('/api/authors', async (req, res) => {
-  try {
-    const { firstName, lastName, dob, dod, sex, profession, biography, portrait } = req.body;
-    const sql = `
-      INSERT INTO q_authors
-        ("firstName","lastName","dob","dod","sex","profession","biography","portrait")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-    `;
-    await pool.query(sql, [firstName, lastName, dob, dod, sex, profession, biography, portrait]);
-    res.redirect('/');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error adding author.");
-  }
-});
-
-// API – add quote
+// ─── API: Add Quote ─────────────────────────────────────────────────────────────
 app.post('/api/quotes', async (req, res) => {
   try {
     const { quote, authorId, category, likes } = req.body;
-    const sql = `
-      INSERT INTO q_quotes
-        ("quote","authorId","category","likes")
-      VALUES ($1,$2,$3,$4)
-    `;
-    await pool.query(sql, [quote, authorId, category, likes]);
+    await pool.query(`
+      INSERT INTO q_quotes("quote","authorId","category","likes")
+      VALUES($1,$2,$3,$4)
+    `, [quote, authorId, category, likes]);
     res.redirect('/');
   } catch (err) {
     console.error(err);
@@ -182,45 +161,33 @@ app.post('/api/quotes', async (req, res) => {
   }
 });
 
-// API – edit form partial
+// ─── API: Edit Form Partial ─────────────────────────────────────────────────────
 app.get('/api/quotes/:id/edit', async (req, res) => {
   try {
     const { id } = req.params;
-    const quoteSql = `SELECT * FROM q_quotes WHERE "quoteId" = $1`;
-    const authorsSql = `
-      SELECT "authorId","firstName","lastName"
-      FROM q_authors
-      ORDER BY "lastName"
-    `;
-
-    const quoteResult   = await pool.query(quoteSql, [id]);
-    const authorsResult = await pool.query(authorsSql);
-
-    res.render('partials/editQuoteForm', {
-      quote:   quoteResult.rows[0],
-      authors: authorsResult.rows
-    });
+    const quoteRow   = (await pool.query(`
+      SELECT * FROM q_quotes WHERE "quoteId" = $1
+    `, [id])).rows[0];
+    const authors    = (await pool.query(`
+      SELECT "authorId","firstName","lastName" FROM q_authors ORDER BY "lastName"
+    `)).rows;
+    res.render('partials/editQuoteForm', { quote: quoteRow, authors });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching quote details for editing.");
+    res.status(500).send("Error loading edit form.");
   }
 });
 
-// API – update quote
+// ─── API: Update Quote ─────────────────────────────────────────────────────────
 app.post('/api/quotes/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { quote, authorId, category, likes } = req.body;
-    const sql = `
+    await pool.query(`
       UPDATE q_quotes
-      SET
-        "quote"    = $1,
-        "authorId" = $2,
-        "category" = $3,
-        "likes"    = $4
+      SET "quote"=$1,"authorId"=$2,"category"=$3,"likes"=$4
       WHERE "quoteId" = $5
-    `;
-    await pool.query(sql, [quote, authorId, category, likes, id]);
+    `, [quote, authorId, category, likes, id]);
     res.redirect('/');
   } catch (err) {
     console.error(err);
@@ -228,15 +195,31 @@ app.post('/api/quotes/:id', async (req, res) => {
   }
 });
 
-// API – delete quote
+// ─── API: Delete Quote ─────────────────────────────────────────────────────────
 app.delete('/api/quotes/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await pool.query(`DELETE FROM q_quotes WHERE "quoteId" = $1`, [id]);
-    res.json({ success: true, message: 'Quote deleted.' });
+    await pool.query(`
+      DELETE FROM q_quotes WHERE "quoteId" = $1
+    `, [req.params.id]);
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Error deleting quote.' });
+    res.status(500).json({ success: false });
+  }
+});
+
+// ─── API: Delete Author & Their Quotes ─────────────────────────────────────────
+app.delete('/api/authors/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // remove their quotes first
+    await pool.query(`DELETE FROM q_quotes WHERE "authorId" = $1`, [id]);
+    // then the author
+    await pool.query(`DELETE FROM q_authors WHERE "authorId" = $1`, [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Error deleting author.' });
   }
 });
 
