@@ -2,7 +2,6 @@ import express from 'express';
 import pg from 'pg';
 const { Pool } = pg;
 
-import 'dotenv/config'; 
 
 const app = express();
 app.set("view engine", "ejs");
