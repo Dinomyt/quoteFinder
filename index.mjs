@@ -19,7 +19,7 @@ const pool = new Pool({
 // Root route
 app.get('/', async (req, res) => {
   try {
-    const authorSql = 'SELECT authorid, firstname, lastname FROM q_authors ORDER BY lastname';
+    const authorSql = 'SELECT authorId, firstName, lastName FROM q_authors ORDER BY lastName';
     const categorySql = 'SELECT DISTINCT category FROM q_quotes ORDER BY category';
     
     const { rows: authors } = await pool.query(authorSql);
