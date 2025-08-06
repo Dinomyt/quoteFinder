@@ -15,7 +15,7 @@ const pool = new Pool({
     }
 });
 
-console.log("Updated V1");
+console.log("Updated V2");
 // Root route
 app.get('/', async (req, res) => {
   try {
@@ -114,10 +114,10 @@ app.get('/api/author/:id', async (req, res) => {
 
 app.post('/api/authors', async (req, res) => {
     try {
-        const { firstName, lastName, dob, dod, country, profession, bio, pictureUrl } = req.body;
+        const { firstName, lastName, dob, dod, sex, profession, biography, portrait } = req.body;
         // Column names in INSERT should also be quoted if they are case-sensitive
-        const sql = `INSERT INTO q_authors ("firstName", "lastName", dob, dod, country, profession, bio, "pictureUrl") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
-        await pool.query(sql, [firstName, lastName, dob, dod, country, profession, bio, pictureUrl]);
+        const sql = `INSERT INTO q_authors ("firstName", "lastName", dob, dod, sex, profession, biography, "portrait") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+        await pool.query(sql, [firstName, lastName, dob, dod, sex, profession, biography, portrait]);
         res.redirect('/');
     } catch (err) {
         console.error(err);
