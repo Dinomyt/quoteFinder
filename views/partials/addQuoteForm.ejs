@@ -1,0 +1,34 @@
+<form action="/api/quotes/<%= quote.quoteid %>" method="POST">
+    <div class="modal-header">
+        <h5 class="modal-title">Edit Quote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label for="quote" class="form-label">Quote</label>
+            <textarea class="form-control" name="quote" rows="3" required><%= quote.quote %></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="authorId" class="form-label">Author</label>
+            <select class="form-select" name="authorId" required>
+                <% authors.forEach(function(author) { %>
+                    <option value="<%= author.authorid %>" <%= quote.authorid == author.authorid ? 'selected' : '' %>>
+                        <%= author.firstname %> <%= author.lastname %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <input type="text" class="form-control" name="category" value="<%= quote.category %>" required>
+        </div>
+        <div class="mb-3">
+            <label for="likes" class="form-label">Likes</label>
+            <input type="number" class="form-control" name="likes" value="<%= quote.likes %>" required>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+</form>

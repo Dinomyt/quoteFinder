@@ -1,0 +1,35 @@
+<div class="modal fade" id="addQuoteModal" tabindex="-1" aria-labelledby="addQuoteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addQuoteModalLabel">Add New Quote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/api/quotes" method="POST">
+          <div class="mb-3">
+            <label for="quote" class="form-label">Quote</label>
+            <textarea class="form-control" id="quote" name="quote" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="authorId" class="form-label">Author</label>
+            <select class="form-select" id="authorId" name="authorId" required>
+              <% authors.forEach(function(author) { %>
+                <option value="<%= author.authorid %>"><%= author.firstname %> <%= author.lastname %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <input type="text" class="form-control" id="category" name="category" required>
+          </div>
+          <div class="mb-3">
+            <label for="likes" class="form-label">Likes</label>
+            <input type="number" class="form-control" id="likes" name="likes" value="0" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

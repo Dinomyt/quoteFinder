@@ -12,6 +12,10 @@
             <a href="#" class="author-link" id="<%= q.authorId %>"><%= q.firstName %> <%= q.lastName %></a>
           </footer>
         </blockquote>
+        <div class="mt-3">
+            <button class="btn btn-warning btn-sm" onclick="editQuote('<%= q.quoteId %>')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteQuote('<%= q.quoteId %>')">Delete</button>
+        </div>
       </div>
     </div>
   <% }) %>
@@ -22,6 +26,14 @@
 <% } %>
 
 <a href="/" class="btn btn-secondary mt-3">Back to Search</a>
+
+<div class="modal fade" id="editQuoteModal" tabindex="-1" aria-labelledby="editQuoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="authorModal" tabindex="-1" aria-labelledby="authorModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">

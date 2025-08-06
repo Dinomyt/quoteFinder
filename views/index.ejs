@@ -5,6 +5,15 @@
   <p class="lead">Find inspiration from the greatest minds.</p>
 </div>
 
+<div class="row justify-content-center mt-4">
+    <div class="col-md-3">
+        <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addAuthorModal">Add New Author</button>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#addQuoteModal">Add New Quote</button>
+    </div>
+</div>
+
 <div class="row g-4 justify-content-center mt-4">
 
   <div class="col-md-6">
@@ -74,5 +83,8 @@
   </div>
 
 </div>
+
+<%- include("partials/addAuthorModal.ejs") %>
+<%- include("partials/addQuoteModal.ejs", { authors: authors }) %>
 
 <%- include("partials/footer.ejs") %>
