@@ -19,7 +19,7 @@ const pool = new Pool({
 // Root route
 app.get('/', async (req, res) => {
   try {
-    const authorSql = 'SELECT authorId, firstName, lastName FROM q_authors ORDER BY lastName';
+    const authorSql = 'SELECT authorid, firstname, lastname FROM q_authors ORDER BY lastname';
     const categorySql = 'SELECT DISTINCT category FROM q_quotes ORDER BY category';
     
     const { rows: authors } = await pool.query(authorSql);
@@ -28,7 +28,7 @@ app.get('/', async (req, res) => {
     res.render('index', { authors: authors, categories: categories });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching data....");
+    res.status(500).send("Error fetching data.....");
   }
 });
 
